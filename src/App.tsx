@@ -6,14 +6,14 @@ import VoiceSelector from "./components/VoiceSelector";
 import TemperatureControl from "./components/TemperatureControl";
 import WaveAnimation from "./components/WaveAnimation";
 import StatusMessage from "./components/StatusMessage";
-import { generateAudio } from "./services/geminiService";
+import { availableVoices, generateAudio } from "./services/geminiService";
 
 function App() {
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState("Sulafat");
+  const [selectedVoice, setSelectedVoice] = useState(availableVoices[0].id);
   const [temperature, setTemperature] = useState(1.0);
 
   const handleGenerateAudio = async (text: string) => {
@@ -116,8 +116,12 @@ function App() {
               生成された音声
             </h3>
             <div className="space-y-4">
-              {audioUrls.map((url, index) => (
-                <AudioPlayer key={index} audioUrl={url} />
+              {[...audioUrls].reverse().map((url, index) => (
+                <AudioPlayer
+                  key={url}
+                  audioUrl={url}
+                  index={audioUrls.length - 1 - index}
+                />
               ))}
             </div>
           </div>

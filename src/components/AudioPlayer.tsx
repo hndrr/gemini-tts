@@ -1,12 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Download, Pause, Play } from 'lucide-react';
+import React, { useRef, useState, useEffect } from "react";
+import { Download, Pause, Play } from "lucide-react";
 
 interface AudioPlayerProps {
   audioUrl: string | null;
   fileName?: string;
+  index?: number; // Add index property
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generated-audio.wav' }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  audioUrl,
+  fileName = "generated-audio.wav",
+  index,
+}) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,14 +40,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generat
       audio.currentTime = 0;
     };
 
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('durationchange', handleDurationChange);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("durationchange", handleDurationChange);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('durationchange', handleDurationChange);
-      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("durationchange", handleDurationChange);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [audioUrl]);
 
@@ -66,15 +71,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generat
     const rect = progressBar.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percent = x / rect.width;
-    
+
     audio.currentTime = percent * audio.duration;
     setProgress(percent * 100);
   };
 
   const handleDownload = () => {
     if (!audioUrl) return;
-    
-    const a = document.createElement('a');
+
+    const a = document.createElement("a");
     a.href = audioUrl;
     a.download = fileName;
     document.body.appendChild(a);
@@ -83,10 +88,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generat
   };
 
   const formatTime = (seconds: number): string => {
-    if (isNaN(seconds)) return '00:00';
+    if (isNaN(seconds)) return "00:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   if (!audioUrl) return null;
@@ -96,19 +103,24 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generat
       <audio ref={audioRef} src={audioUrl} />
 
       <div className="flex items-center justify-between mb-2">
+        {index !== undefined && (
+          <span className="bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
+            {index + 1}
+          </span>
+        )}
         <button
           onClick={togglePlayPause}
           className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200"
         >
           {isPlaying ? <Pause size={20} /> : <Play size={20} />}
         </button>
-        
+
         <div className="flex-1 mx-4">
-          <div 
+          <div
             className="relative w-full h-2 bg-gray-200 rounded-full cursor-pointer"
             onClick={handleProgressBarClick}
           >
-            <div 
+            <div
               className="absolute h-full bg-indigo-600 rounded-full"
               style={{ width: `${progress}%` }}
             />
@@ -118,7 +130,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, fileName = 'generat
             <span>{formatTime(duration)}</span>
           </div>
         </div>
-        
+
         <button
           onClick={handleDownload}
           className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
