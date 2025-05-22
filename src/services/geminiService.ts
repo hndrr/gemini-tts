@@ -15,10 +15,36 @@ export interface GenerateAudioResponse {
 
 export const availableVoices = [
   { id: "Sulafat", name: "スラファト (女性)" },
-  { id: "Alphecca", name: "アルフェッカ (女性)" },
-  { id: "Amber", name: "アンバー (女性)" },
-  { id: "Capella", name: "カペラ (男性)" },
-  { id: "Hadar", name: "ハダル (男性)" },
+  { id: "Zephyr", name: "Zephyr (明るい)" },
+  { id: "Puck", name: "Puck (陽気な)" },
+  { id: "Charon", name: "Charon (情報豊かな)" },
+  { id: "Kore", name: "Kore (しっかりした)" },
+  { id: "Fenrir", name: "Fenrir (活発な)" },
+  { id: "Leda", name: "Leda (若々しい)" },
+  { id: "Orus", name: "Orus (しっかりした)" },
+  { id: "Aoede", name: "Aoede (軽快な)" },
+  { id: "Callirhoe", name: "Callirhoe (気楽な)" },
+  { id: "Autonoe", name: "Autonoe (明るい)" },
+  { id: "Enceladus", name: "Enceladus (息遣いのある)" },
+  { id: "Iapetus", name: "Iapetus (クリアな)" },
+  { id: "Umbriel", name: "Umbriel (気楽な)" },
+  { id: "Algieba", name: "Algieba (滑らかな)" },
+  { id: "Despina", name: "Despina (滑らかな)" },
+  { id: "Erinome", name: "Erinome (クリアな)" },
+  { id: "Algenib", name: "Algenib (しわがれた)" },
+  { id: "Rasalgethi", name: "Rasalgethi (情報豊かな)" },
+  { id: "Laomedeia", name: "Laomedeia (陽気な)" },
+  { id: "Achernar", name: "Achernar (柔らかい)" },
+  { id: "Alnilam", name: "Alnilam (しっかりした)" },
+  { id: "Schedar", name: "Schedar (落ち着いた)" },
+  { id: "Gacrux", name: "Gacrux (円熟した)" },
+  { id: "Pulcherrima", name: "Pulcherrima (前向きな)" },
+  { id: "Achird", name: "Achird (親しみやすい)" },
+  { id: "Zubenelgenubi", name: "Zubenelgenubi (カジュアルな)" },
+  { id: "Vindemiatrix", name: "Vindemiatrix (穏やかな)" },
+  { id: "Sadachbia", name: "Sadachbia (活気のある)" },
+  { id: "Sadaltager", name: "Sadaltager (知識豊富な)" },
+  { id: "Sulafar", name: "Sulafar (温かい)" },
 ];
 
 export async function generateAudio(
@@ -68,7 +94,7 @@ export async function generateAudio(
     const model = "gemini-2.5-flash-preview-tts";
     const contents = [
       {
-        role: "user",
+        // role: "user",
         parts: [
           {
             text: text,
