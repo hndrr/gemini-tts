@@ -178,8 +178,16 @@ export async function generateAudio(
         };
       }
 
+      // Base64 データを Uint8Array に変換
+      const byteCharacters = atob(audioData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const rawAudioUint8Array = new Uint8Array(byteNumbers);
+
       // convertToWav を使用して WAV ヘッダーを付与
-      const wavBuffer = convertToWav(audioData, mimeType);
+      const wavBuffer = convertToWav(rawAudioUint8Array, mimeType);
       const byteArray = new Uint8Array(wavBuffer);
 
       let fileExtension = mime.getExtension(mimeType);
@@ -188,6 +196,8 @@ export async function generateAudio(
       }
 
       console.log("Blobオブジェクトを作成: audio/wav");
+      console.log("byteArray の長さ:", byteArray.length);
+      console.log("byteArray の最初の10バイト:", byteArray.slice(0, 10));
       const blob = new Blob([byteArray], { type: "audio/wav" });
       const audioUrl = URL.createObjectURL(blob);
       console.log("音声URL作成完了");
@@ -197,7 +207,17 @@ export async function generateAudio(
         text: textResponse,
       };
     } catch (apiError) {
-      console.error("API呼び出しエラー:", JSON.stringify(apiError, null, 2));
+      console.error("API呼び出しエラー:", apiError);
+      if (apiError instanceof Error) {
+        console.error(
+          "API呼び出しエラー (詳細):",
+          apiError.name,
+          apiError.message,
+          apiError.stack
+        );
+      } else {
+        console.error("API呼び出しエラー (詳細):", String(apiError));
+      }
 
       // API特有のエラーメッセージを解析して、よりユーザーフレンドリーなメッセージを提供
       let errorMessage = "音声生成中にエラーが発生しました";
