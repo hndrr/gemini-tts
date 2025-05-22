@@ -16,13 +16,19 @@ function App() {
   const [selectedVoice, setSelectedVoice] = useState(availableVoices[0].id);
   const [temperature, setTemperature] = useState(1.0);
 
-  const handleGenerateAudio = async (text: string) => {
+  const handleGenerateAudio = async (
+    instruction: string,
+    textToSpeak: string
+  ) => {
     setIsLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const result = await generateAudio(text, {
+      const fullText = instruction
+        ? `(${instruction}) ${textToSpeak}`
+        : textToSpeak;
+      const result = await generateAudio(fullText, {
         voiceName: selectedVoice,
         temperature: temperature,
       });

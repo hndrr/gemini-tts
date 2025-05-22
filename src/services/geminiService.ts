@@ -44,7 +44,6 @@ export const availableVoices = [
   { id: "Vindemiatrix", name: "Vindemiatrix (穏やかな)" },
   { id: "Sadachbia", name: "Sadachbia (活気のある)" },
   { id: "Sadaltager", name: "Sadaltager (知識豊富な)" },
-  { id: "Sulafar", name: "Sulafar (温かい)" },
 ];
 
 export async function generateAudio(
