@@ -21,7 +21,7 @@
 1. リポジトリをクローンします。
 
    ```bash
-   git clone [リポジトリのURL]
+   git clone https://github.com/hndrr/gemini-tts.git
    cd gemini-tts
    ```
 
