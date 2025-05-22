@@ -14,7 +14,6 @@ export interface GenerateAudioResponse {
 }
 
 export const availableVoices = [
-  { id: "Sulafat", name: "スラファト (女性)" },
   { id: "Zephyr", name: "Zephyr (明るい)" },
   { id: "Puck", name: "Puck (陽気な)" },
   { id: "Charon", name: "Charon (情報豊かな)" },
@@ -44,6 +43,7 @@ export const availableVoices = [
   { id: "Vindemiatrix", name: "Vindemiatrix (穏やかな)" },
   { id: "Sadachbia", name: "Sadachbia (活気のある)" },
   { id: "Sadaltager", name: "Sadaltager (知識豊富な)" },
+  { id: "Sulafat", name: "Sulafat (あたたかい)" },
 ];
 
 export async function generateAudio(
@@ -104,84 +104,29 @@ export async function generateAudio(
 
     console.log("APIリクエスト送信中...");
     try {
-      const response = await ai.models.generateContentStream({
+      const response = await ai.models.generateContent({
         model,
         config,
         contents,
       });
 
       console.log("APIレスポンス受信完了");
+      console.log("レスポンスデータ:", response);
 
-      // 変数を初期化
-      let audioData = "";
-      let mimeType = "";
-      let textResponse = "";
-      let hasReceivedAudioData = false;
-      let finishReason = "";
-      let usageMetadata = null;
-
-      for await (const chunk of response) {
-        // チャンクの情報をログに記録
-        console.log("チャンク受信:", JSON.stringify(chunk, null, 2));
-
-        // usage metadata があれば保存
-        if (chunk.usageMetadata) {
-          usageMetadata = chunk.usageMetadata;
-          console.log(
-            "使用メタデータ:",
-            JSON.stringify(usageMetadata, null, 2)
-          );
-        }
-
-        // chunk.candidatesが存在するか確認
-        if (!chunk.candidates || chunk.candidates.length === 0) {
-          console.log("候補のないチャンクをスキップ");
-          continue;
-        }
-
-        // finishReason があれば保存
-        const candidate = chunk.candidates[0];
-        if (candidate.finishReason) {
-          finishReason = candidate.finishReason;
-          console.log("完了理由:", finishReason);
-        }
-
-        // chunk.candidates[0].contentが存在するか確認
-        if (!candidate.content) {
-          console.log("コンテンツのないチャンクをスキップ");
-          continue;
-        }
-
-        // chunk.candidates[0].content.partsが存在するか確認
-        const parts = candidate.content.parts;
-        if (!parts || parts.length === 0) {
-          console.log("パーツのないチャンクをスキップ");
-          continue;
-        }
-
-        for (const part of parts) {
-          if (part.inlineData) {
-            console.log(
-              "音声データを受信: " +
-                (part.inlineData.mimeType || "unknown mime type")
-            );
-            audioData = part.inlineData.data || "";
-            mimeType = part.inlineData.mimeType || "";
-            hasReceivedAudioData = true;
-          } else if (part.text) {
-            console.log("テキストレスポンスを受信");
-            textResponse += part.text;
-          }
-        }
-      }
-
+      const { data: audioData, mimeType } =
+        response.candidates?.[0]?.content?.parts?.[0]?.inlineData || {};
+      const textResponse =
+        response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const finishReason = response.candidates?.[0]?.finishReason;
+      const usageMetadata = response.usageMetadata;
+      let errorMessage = "";
       // finishReason が 'OTHER' の場合のエラーハンドリング
       if (finishReason === "OTHER") {
         console.error(
           "APIが音声生成を完了できませんでした。完了理由:",
           finishReason
         );
-        let errorMessage = `APIが音声生成を完了できませんでした。完了理由: ${finishReason}。テキストの内容を変更して再試行してください。`;
+        errorMessage = `APIが音声生成を完了できませんでした。完了理由: ${finishReason}。テキストの内容を変更して再試行してください。`;
 
         // メタデータに基づいて詳細なエラーメッセージを提供
         if (usageMetadata) {
@@ -195,7 +140,7 @@ export async function generateAudio(
         return { error: errorMessage };
       }
 
-      if (!hasReceivedAudioData || !audioData || !mimeType) {
+      if (!audioData || !mimeType) {
         console.error("APIから音声データが受信されませんでした");
         return {
           error:
